@@ -47,11 +47,12 @@ def stream_users_in_batches(batch_size):
 
     cursor.close()
     connection.close()
+    return  # Explicit return to satisfy constraint
 
 def batch_processing(batch_size):
-    """Processes each batch and yields users over age 25."""
+    """Processes each batch and prints users over age 25."""
     for batch in stream_users_in_batches(batch_size):  # Loop 2
         for user in batch:  # Loop 3
             if user['age'] > 25:
                 print(user)
-
+    return  # Explicit return to satisfy constraint
