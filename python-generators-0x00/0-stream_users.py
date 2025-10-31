@@ -1,6 +1,8 @@
 (venv)faithokoth@Faiths-MacBook-Pro python-generators-0x00 % cat 1-main.py 
 
 #!/usr/bin/python3
+import mysql.connector
+
 from itertools import islice
 stream_users = __import__('0-stream_users')
 
@@ -19,3 +21,20 @@ for user in islice(stream_users(), 6):
 {'user_id': '01187f09-72be-4924-8a2d-150645dcadad', 'name': 'Jonathon Jones', 'email': 'Jody.Quigley-Ziemann33@yahoo.com', 'age': 116}
 
 (venv) faithokoth@Faiths-MacBook-Pro python-generators-0x00 %
+
+def stream_users():
+    """Generator that yields rows from the user_data table one by one."""
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='your_password',  # Replace with your actual MySQL password
+        database='ALX_prodev'
+    )
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM user_data")
+
+    for row in cursor:
+        yield row
+
+    cursor.close()
+    connection.close()
