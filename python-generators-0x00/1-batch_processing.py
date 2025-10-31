@@ -22,3 +22,36 @@ except BrokenPipeError:
 {'user_id': '01187f09-72be-4924-8a2d-150645dcadad', 'name': 'Jonathon Jones', 'email': 'Jody.Quigley-Ziemann33@yahoo.com', 'age': 116}
 
 (venv) faithokoth@Faiths-MacBook-Pro python-generators-0x00 % 
+
+import mysql.connector
+
+def stream_users_in_batches(batch_size):
+    """Generator that yields batches of users from the user_data table."""
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='your_password',  # Replace with your actual password
+        database='ALX_prodev'
+    )
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM user_data")
+
+    batch = []
+    for row in cursor:  # Loop 1
+        batch.append(row)
+        if len(batch) == batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
+
+    cursor.close()
+    connection.close()
+
+def batch_processing(batch_size):
+    """Processes each batch and yields users over age 25."""
+    for batch in stream_users_in_batches(batch_size):  # Loop 2
+        for user in batch:  # Loop 3
+            if user['age'] > 25:
+                print(user)
+
