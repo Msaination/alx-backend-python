@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 test_utils.py
-Unit tests for utils.access_nested_map, 
-utils.get_json, and utils.memoize
-functions.
+Unit tests for utils.access_nested_map,
+utils.get_json, and utils.memoize functions.
 
 This script uses unittest and parameterized to validate
 the behavior of utility functions across multiple scenarios.
@@ -74,13 +73,17 @@ class TestGetJson(unittest.TestCase):
             mock_get.assert_called_once_with(test_url)
             self.assertEqual(result, test_payload)
 
+
 class TestMemoize(unittest.TestCase):
     """
     Unit test suite for the memoize decorator.
     """
 
     def test_memoize(self) -> None:
-        """Test that memoize caches the result and calls the method only once."""
+        """Test that memoize caches the result.
+
+        Ensures the method is only called once.
+        """
 
         class TestClass:
             def a_method(self) -> int:
@@ -90,11 +93,8 @@ class TestMemoize(unittest.TestCase):
             def a_property(self) -> int:
                 return self.a_method()
 
-        with patch.object(
-            TestClass,
-            "a_method",
-            return_value=42
-        ) as mock_method:
+        with patch.object(TestClass, "a_method",
+                          return_value=42) as mock_method:
             obj = TestClass()
 
             result1 = obj.a_property
@@ -104,7 +104,6 @@ class TestMemoize(unittest.TestCase):
             self.assertEqual(result2, 42)
 
             mock_method.assert_called_once()
-
 
 
 if __name__ == "__main__":
