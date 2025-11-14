@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 test_utils.py
-Unit tests for utils.access_nested_map, utils.get_json, and utils.memoize
+Unit tests for utils.access_nested_map, 
+utils.get_json, and utils.memoize
 functions.
 
 This script uses unittest and parameterized to validate
@@ -80,7 +81,10 @@ class TestMemoize(unittest.TestCase):
     """
 
     def test_memoize(self) -> None:
-        """Test that memoize caches the result and calls the method only once."""
+       """Test that memoize caches the result.
+
+        Ensures the method is only called once.
+        """
 
         class TestClass:
             def a_method(self) -> int:
