@@ -45,7 +45,7 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(result, expected_url)
 
     def test_public_repos(self) -> None:
-        """Test that public_repos returns the expected list of repo names."""
+        """Test that public_repos returns the expected list of names."""
         repos_payload = [
             {"name": "repo1", "license": {"key": "apache-2.0"}},
             {"name": "repo2", "license": {"key": "mit"}},
@@ -90,7 +90,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
         def side_effect(url: str):
             mock_response = unittest.mock.Mock()
-            if url == GithubOrgClient.ORG_URL.format(org="test-org"):
+            org_url = GithubOrgClient.ORG_URL.format(org="test-org")
+            if url == org_url:
                 mock_response.json.return_value = cls.org_payload
             elif url == cls.org_payload["repos_url"]:
                 mock_response.json.return_value = cls.repos_payload
@@ -107,14 +108,15 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
     def test_public_repos(self) -> None:
-        """Test that public_repos returns expected repo names from fixtures."""
+        """Test that public_repos returns expected names from fixtures."""
         client = GithubOrgClient("test-org")
         self.assertEqual(client.public_repos(), self.expected_repos)
 
     def test_public_repos_with_license(self) -> None:
-        """Test that public_repos filters repos by license key using fixtures."""
+        """Test that public_repos filters repos by license from fixtures."""
         client = GithubOrgClient("test-org")
-        self.assertEqual(client.public_repos("apache-2.0"), self.apache2_repos)
+        result = client.public_repos(license="apache-2.0")
+        self.assertEqual(result, self.apache2_repos)
 
 
 if __name__ == "__main__":
