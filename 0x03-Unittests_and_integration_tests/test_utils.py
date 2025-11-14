@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 test_utils.py
-Unit tests for utils.access_nested_map and utils.get_json functions.
+Unit tests for utils.access_nested_map, utils.get_json, and utils.memoize functions.
 
 This script uses unittest and parameterized to validate
 the behavior of utility functions across multiple scenarios.
@@ -21,9 +21,6 @@ import utils
 class TestAccessNestedMap(unittest.TestCase):
     """
     Unit test suite for the access_nested_map function.
-
-    Validates correct value retrieval from nested mappings
-    using various key path sequences.
     """
 
     @parameterized.expand([
@@ -55,9 +52,6 @@ class TestAccessNestedMap(unittest.TestCase):
 class TestGetJson(unittest.TestCase):
     """
     Unit test suite for the get_json function.
-
-    Ensures JSON is correctly fetched and parsed
-    without making real HTTP requests.
     """
 
     @parameterized.expand([
@@ -65,30 +59,47 @@ class TestGetJson(unittest.TestCase):
         ("http://holberton.io", {"payload": False}),
     ])
     def test_get_json(self, test_url: str, test_payload: Dict[str, Any]) -> None:
-        """
-        Test that get_json returns the expected payload.
-
-        Parameters
-        ----------
-        test_url : str
-            The URL to fetch JSON from.
-        test_payload : Dict[str, Any]
-            The mocked JSON payload to return.
-        """
+        """Test that get_json returns the expected payload."""
         with patch("utils.requests.get") as mock_get:
-            # Create a mock response object
             mock_response = Mock()
             mock_response.json.return_value = test_payload
             mock_get.return_value = mock_response
 
-            # Call the function under test
             result = utils.get_json(test_url)
 
-            # Ensure requests.get was called exactly once with test_url
             mock_get.assert_called_once_with(test_url)
-
-            # Ensure the result matches the mocked payload
             self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    Unit test suite for the memoize decorator.
+    """
+
+    def test_memoize(self) -> None:
+        """Test that memoize caches the result and calls the method only once."""
+
+        class TestClass:
+            def a_method(self) -> int:
+                return 42
+
+            @utils.memoize
+            def a_property(self) -> int:
+                return self.a_method()
+
+        with patch.object(TestClass, "a_method", return_value=42) as mock_method:
+            obj = TestClass()
+
+            # Call the memoized property twice
+            result1 = obj.a_property
+            result2 = obj.a_property
+
+            # Both calls should return the same result
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
+
+            # a_method should only be called once
+            mock_method.assert_called_once()
 
 
 if __name__ == "__main__":
