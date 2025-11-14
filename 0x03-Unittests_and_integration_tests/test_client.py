@@ -7,7 +7,7 @@ Unit tests for client.GithubOrgClient class.
 import unittest
 from unittest.mock import patch, PropertyMock
 from parameterized import parameterized
-from typing import Dict
+from typing import Dict, List
 from client import GithubOrgClient
 
 
@@ -33,19 +33,33 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, expected_payload)
 
     def test_public_repos_url(self) -> None:
-        """
-        Test that _public_repos_url returns the correct URL
-        based on the mocked org payload.
-        """
+        """Test that _public_repos_url returns the correct URL."""
         expected_url = "https://api.github.com/orgs/test-org/repos"
         payload = {"repos_url": expected_url}
-
         with patch.object(GithubOrgClient, "org",
                           new_callable=PropertyMock) as mock_org:
             mock_org.return_value = payload
             client = GithubOrgClient("test-org")
             result = client._public_repos_url
             self.assertEqual(result, expected_url)
+
+    def test_public_repos(self) -> None:
+        """
+        Test that public_repos returns the expected list of repo names
+        based on the mocked repos_payload.
+        """
+        repos_payload = [
+            {"name": "repo1", "license": {"key": "apache-2.0"}},
+            {"name": "repo2", "license": {"key": "mit"}},
+        ]
+        expected_repos: List[str] = ["repo1", "repo2"]
+
+        with patch.object(GithubOrgClient, "repos_payload",
+                          new_callable=PropertyMock) as mock_repos:
+            mock_repos.return_value = repos_payload
+            client = GithubOrgClient("test-org")
+            result = client.public_repos()
+            self.assertEqual(result, expected_repos)
 
 
 if __name__ == "__main__":
