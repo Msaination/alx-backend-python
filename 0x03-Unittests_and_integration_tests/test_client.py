@@ -44,10 +44,7 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(result, expected_url)
 
     def test_public_repos(self) -> None:
-        """
-        Test that public_repos returns the expected list of repo names
-        based on the mocked repos_payload.
-        """
+        """Test that public_repos returns the expected list of repo names."""
         repos_payload = [
             {"name": "repo1", "license": {"key": "apache-2.0"}},
             {"name": "repo2", "license": {"key": "mit"}},
@@ -60,6 +57,18 @@ class TestGithubOrgClient(unittest.TestCase):
             client = GithubOrgClient("test-org")
             result = client.public_repos()
             self.assertEqual(result, expected_repos)
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
+    ])
+    def test_has_license(self,
+                         repo: Dict[str, Dict],
+                         license_key: str,
+                         expected: bool) -> None:
+        """Test that has_license returns the correct boolean result."""
+        result = GithubOrgClient.has_license(repo, license_key)
+        self.assertEqual(result, expected)
 
 
 if __name__ == "__main__":
