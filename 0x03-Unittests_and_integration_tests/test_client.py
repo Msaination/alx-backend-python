@@ -45,7 +45,7 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(result, expected_url)
 
     def test_public_repos(self) -> None:
-        """Test that public_repos returns the expected list of names."""
+        """Test that public_repos returns the expected list of repo names."""
         repos_payload = [
             {"name": "repo1", "license": {"key": "apache-2.0"}},
             {"name": "repo2", "license": {"key": "mit"}},
@@ -108,12 +108,12 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
     def test_public_repos(self) -> None:
-        """Test that public_repos returns expected names from fixtures."""
+        """Test that public_repos returns expected repo names from fixtures."""
         client = GithubOrgClient("test-org")
         self.assertEqual(client.public_repos(), self.expected_repos)
 
     def test_public_repos_with_license(self) -> None:
-        """Test that public_repos filters repos by license from fixtures."""
+        """Test that public_repos filters repos by license key using fixtures."""
         client = GithubOrgClient("test-org")
         result = client.public_repos(license="apache-2.0")
         self.assertEqual(result, self.apache2_repos)
