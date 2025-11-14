@@ -115,9 +115,12 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def test_public_repos_with_license(self) -> None:
         """Test that public_repos filters repos by license key using fixtures."""
         client = GithubOrgClient("test-org")
-        result = client.public_repos(license="apache-2.0")
+        result = client.public_repos(
+            license="apache-2.0"
+        )
         self.assertEqual(result, self.apache2_repos)
-
 
 if __name__ == "__main__":
     unittest.main()
+
+
