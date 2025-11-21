@@ -102,7 +102,8 @@ DATABASES = {
 #        'NAME': BASE_DIR / "db.sqlite3",
 #    }
 #}
-
+# Custom user model
+AUTH_USER_MODEL = 'chats.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
