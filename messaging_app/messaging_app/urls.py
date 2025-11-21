@@ -22,4 +22,5 @@ from django.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("chats.urls")),   # all chats endpoints under /api/
+    path("api-auth/", include("rest_framework.urls")),  # browsable API login/logout
 ]
