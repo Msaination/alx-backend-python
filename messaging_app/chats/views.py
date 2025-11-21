@@ -1,5 +1,5 @@
 # chats/views.py
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 
@@ -15,6 +15,17 @@ class ConversationViewSet(viewsets.ModelViewSet):
         conversation = serializer.save()
         conversation.participants.add(self.request.user)
         return conversation
+    
+    def add_participant(self, request, pk=None):
+        conversation = self.get_object()
+        user_id = request.data.get("user_id")
+        try:
+            user = User.objects.get(id=user_id)
+            conversation.participants.add(user)
+            return Response({"status": "participant added"}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
 
 
 class MessageViewSet(viewsets.ModelViewSet):
