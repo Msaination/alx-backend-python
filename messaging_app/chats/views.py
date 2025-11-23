@@ -10,6 +10,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["participants__email"]   # search by participant email
     ordering_fields = ["created_at"]
+    
+    def get_queryset(self):
+        # Only conversations where the user is a participant
+        return Conversation.objects.filter(participants=self.request.user)
 
     def perform_create(self, serializer):
         conversation = serializer.save()
@@ -35,6 +39,11 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body", "sender__email"]
     ordering_fields = ["sent_at"]
+    
+    def get_queryset(self):
+        # Only messages in conversations where the user is a participant
+        return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
+        
