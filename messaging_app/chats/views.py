@@ -9,6 +9,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CustomJWTAuthentication]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["participants__email"]   # search by participant email
     ordering_fields = ["created_at"]
@@ -38,6 +39,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CustomJWTAuthentication]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body", "sender__email"]
     ordering_fields = ["sent_at"]
