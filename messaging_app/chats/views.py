@@ -4,6 +4,7 @@ from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipant, IsMessageOwnerOrParticipant
 from rest_framework.response import Response
+from .filters import MessageFilter
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -41,7 +42,8 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
     authentication_classes = [CustomJWTAuthentication]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, filters.DjangoFilterBackend]
+    filterset_class = MessageFilter
     search_fields = ["message_body", "sender__email"]
     ordering_fields = ["sent_at"]
     
