@@ -1,7 +1,9 @@
-# chats/views.py
 from rest_framework import viewsets, permissions, filters, status
+from rest_framework.permissions import IsAuthenticated
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
+from .permissions import IsParticipant, IsMessageOwnerOrParticipant
+from rest_framework.response import Response
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
