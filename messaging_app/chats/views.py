@@ -49,6 +49,14 @@ class MessageViewSet(viewsets.ModelViewSet):
         # Only messages in conversations where the user is a participant
         return Message.objects.filter(conversation__participants=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
-        
+def perform_create(self, serializer):
+        Conversation_id = self.request.data.get("conversation_id")
+        try:
+            conversation = Conversation.objects.get(id=Conversation_id)
+        except Conversation.DoesNotExist:
+            return Response(
+                {"detail": "Conversation not found."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        serializer.save(sender=self.request.user, conversation=conversation)
+         
