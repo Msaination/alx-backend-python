@@ -29,22 +29,25 @@ class IsParticipantOfConversation(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Require authentication globally
         return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        """
-        Object-level permissions:
-        - For Conversation: user must be a participant
-        - For Message: user must be sender or participant in the conversation
-        """
-        if hasattr(obj, "participants"):  # Conversation instance
+        # Handle Conversation objects
+        if hasattr(obj, "participants"):
             return request.user in obj.participants.all()
 
-        if hasattr(obj, "conversation"):  # Message instance
-            return (
-                obj.sender == request.user or
-                request.user in obj.conversation.participants.all()
-            )
+        # Handle Message objects
+        if hasattr(obj, "conversation"):
+            is_participant = request.user in obj.conversation.participants.all()
+            is_sender = obj.sender == request.user
+
+            # Allow GET for participants
+            if request.method in permissions.SAFE_METHODS:
+                return is_participant or is_sender
+
+            # Allow PUT, PATCH, DELETE only if participant or sender
+            if request.method in ["PUT", "PATCH", "DELETE"]:
+                return is_participant or is_sender
 
         return False
+
