@@ -140,10 +140,9 @@ def sent_messages_view(request):
 @login_required
 def unread_inbox_view(request):
     """
-    Display unread messages for the logged-in user.
-    Uses the custom manager for efficiency.
+    Return unread messages for the logged-in user using the custom manager.
     """
-    messages = Message.unread.for_user(request.user)
+    messages = Message.unread.unread_for_user(request.user)
 
     data = [
         {
