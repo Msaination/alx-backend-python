@@ -140,9 +140,13 @@ def sent_messages_view(request):
 @login_required
 def unread_inbox_view(request):
     """
-    Return unread messages for the logged-in user using the custom manager.
+    Return unread messages for the logged-in user.
+    Optimized with .only() to fetch minimal fields.
     """
-    messages = Message.unread.unread_for_user(request.user)
+    messages = (
+        Message.unread.unread_for_user(request.user)  # custom manager
+        .only("id", "content", "timestamp", "sender")  # restrict fields
+    )
 
     data = [
         {
@@ -154,3 +158,4 @@ def unread_inbox_view(request):
         for m in messages
     ]
     return JsonResponse(data, safe=False)
+
