@@ -35,3 +35,19 @@ class RequestLoggingMiddleware:
         # Continue processing the request
         response = self.get_response(request)
         return response
+        
+class RestrictAccessByTimeMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Current server time (24-hour format)
+        current_hour = datetime.now().hour
+
+        # Allowed window: between 6AM (06:00) and 9PM (21:00)
+        if current_hour < 6 or current_hour >= 21:
+            return HttpResponseForbidden("Access to chat is restricted outside 6AM–9PM.")
+
+        # Continue normal request processing
+        response = self.get_response(request)
+        return response
