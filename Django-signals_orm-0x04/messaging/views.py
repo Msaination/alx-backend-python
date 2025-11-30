@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+from django.views.decorators.cache import cache_page
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
@@ -159,3 +160,34 @@ def unread_inbox_view(request):
     ]
     return JsonResponse(data, safe=False)
 
+@login_required
+@cache_page(60)  # cache for 60 seconds
+def conversation_view(request, message_id):
+    """
+    Fetch a root message and its immediate replies.
+    Cached for 60 seconds to reduce DB hits.
+    """
+    root_message = get_object_or_404(
+        Message.objects.select_related("sender", "receiver"),
+        pk=message_id
+    )
+    replies = root_message.replies.prefetch_related("sender", "receiver")
+
+    data = {
+        "root": {
+            "id": root_message.id,
+            "content": root_message.content,
+            "sender": root_message.sender.username,
+            "receiver": root_message.receiver.username,
+        },
+        "replies": [
+            {
+                "id": r.id,
+                "content": r.content,
+                "sender": r.sender.username,
+                "receiver": r.receiver.username,
+            }
+            for r in replies
+        ]
+    }
+    return JsonResponse(data)
