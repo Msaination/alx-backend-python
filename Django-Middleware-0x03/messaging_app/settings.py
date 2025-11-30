@@ -14,12 +14,6 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
 
-
-
-
-
-
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -70,6 +64,7 @@ MIDDLEWARE = [
     #  Custom request logging middleware in chats app
     'chats.middleware.RequestLoggingMiddleware',
     'chats.middleware.RestrictAccessByTimeMiddleware',
+    'chat.middleware.OffensiveLanguageMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True 
