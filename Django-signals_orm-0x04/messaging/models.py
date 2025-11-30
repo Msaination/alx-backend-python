@@ -11,6 +11,15 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     edited_by = models.BooleanField(default=False)  # track edits
 
+    # Self-referential FK for threaded replies
+    parent_message = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="replies"
+    )
+
 
     def __str__(self):
         return f"From {self.sender} to {self.receiver} at {self.timestamp}"
