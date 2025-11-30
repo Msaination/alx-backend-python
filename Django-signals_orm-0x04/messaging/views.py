@@ -101,7 +101,7 @@ def send_message(request):
         "timestamp": message.timestamp,
     })
 
-@login_required:
+@login_required
 def inbox_view(request):
     """
     Fetch all messages received by the logged-in user.
@@ -132,6 +132,25 @@ def sent_messages_view(request):
             "receiver": m.receiver.username,
             "timestamp": m.timestamp,
             "edited": m.edited,
+        }
+        for m in messages
+    ]
+    return JsonResponse(data, safe=False)
+
+@login_required
+def unread_inbox_view(request):
+    """
+    Display unread messages for the logged-in user.
+    Uses the custom manager for efficiency.
+    """
+    messages = Message.unread.for_user(request.user)
+
+    data = [
+        {
+            "id": m.id,
+            "content": m.content,
+            "sender": m.sender.username,
+            "timestamp": m.timestamp,
         }
         for m in messages
     ]
