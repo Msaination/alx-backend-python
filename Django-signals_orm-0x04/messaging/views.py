@@ -76,3 +76,29 @@ def threaded_conversation_view(request, message_id):
     )
     thread = get_thread(root_message)
     return JsonResponse(thread, safe=False)
+
+
+@login_required
+def send_message(request):
+    """
+    Allow the logged-in user to send a message.
+    Automatically sets sender=request.user.
+    """
+    receiver_id = request.POST.get("receiver_id")
+    content = request.POST.get("content")
+
+    receiver = get_object_or_404(User, pk=receiver_id)
+
+    message = Message.objects.create(
+        sender=request.user,   # <--- here’s the sender=request.user
+        receiver=receiver,
+        content=content
+    )
+    return JsonResponse({
+        "id": message.id,
+        "sender": message.sender.username,
+        "receiver": message.receiver.username,
+        "content": message.content,
+        "timestamp": message.timestamp,
+    })
+    
