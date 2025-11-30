@@ -90,3 +90,22 @@ class OffensiveLanguageMiddleware:
         if x_forwarded_for:
             return x_forwarded_for.split(",")[0].strip()
         return request.META.get("REMOTE_ADDR", "")
+
+class RolepermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Only check if user is authenticated
+        if request.user.is_authenticated:
+            # Example: assuming user roles are stored in request.user.role
+            # or via Django groups/permissions
+            user_role = getattr(request.user, "role", None)
+
+            # Allow only admin or moderator
+            if user_role not in ["admin", "moderator"]:
+                return HttpResponseForbidden("Access denied: insufficient role permissions.")
+
+        # Continue normal processing
+        response = self.get_response(request)
+        return response
