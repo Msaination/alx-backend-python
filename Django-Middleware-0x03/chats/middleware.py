@@ -52,7 +52,7 @@ class RestrictAccessByTimeMiddleware:
         response = self.get_response(request)
         return response
 
-ass OffensiveLanguageMiddleware:
+class OffensiveLanguageMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         # Dictionary to track requests per IP
