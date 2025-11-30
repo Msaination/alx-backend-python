@@ -77,7 +77,6 @@ def threaded_conversation_view(request, message_id):
     thread = get_thread(root_message)
     return JsonResponse(thread, safe=False)
 
-
 @login_required
 def send_message(request):
     """
@@ -101,4 +100,39 @@ def send_message(request):
         "content": message.content,
         "timestamp": message.timestamp,
     })
-    
+
+@login_required:
+def inbox_view(request):
+    """
+    Fetch all messages received by the logged-in user.
+    """
+    messages = Message.objects.filter(receiver=request.user).select_related("sender")
+    data = [
+        {
+            "id": m.id,
+            "content": m.content,
+            "sender": m.sender.username,
+            "timestamp": m.timestamp,
+            "edited": m.edited,
+        }
+        for m in messages
+    ]
+    return JsonResponse(data, safe=False)
+
+@login_required
+def sent_messages_view(request):
+    """
+    Fetch all messages sent by the logged-in user.
+    """
+    messages = Message.objects.filter(sender=request.user).select_related("receiver")
+    data = [
+        {
+            "id": m.id,
+            "content": m.content,
+            "receiver": m.receiver.username,
+            "timestamp": m.timestamp,
+            "edited": m.edited,
+        }
+        for m in messages
+    ]
+    return JsonResponse(data, safe=False)
