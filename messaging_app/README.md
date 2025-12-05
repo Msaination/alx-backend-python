@@ -1,4 +1,4 @@
-📬 Messaging App
+📬 Messaging App local
 A Django-based messaging application with modular structure, RESTful API endpoints, and best-practice configuration.
 🚀 Project Setup
 Prerequisites
