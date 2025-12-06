@@ -20,7 +20,7 @@ services:
     image: mysql:8.0.44
     
     environment:
-      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_DB=${DB_NAME}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
