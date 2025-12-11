@@ -16,10 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter   
+from chats.views import ConversationViewSet, MessageViewSet 
+from rest_framework import routers
 
+
+router = routers.DefaultRouter()
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/chats/', include('chats.urls')),
-    path('api-auth/', include('rest_framework.urls')),  
+    # path('api/chats/', include('chats.urls')),
+    path('api-auth/', include('rest_framework.urls')),
+    path('api/', include(router.urls)),  # include DRF routes under /api/
+    
     
 ]
