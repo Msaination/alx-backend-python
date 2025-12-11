@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer  
 from .permissions import IsParticipant, IsSender, IsParticipantOfConversation
+from .pagination import MessagePagination
 
 
 # Create your views here.
@@ -29,7 +30,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
     permission_classes  = [IsAuthenticated, IsParticipant, IsParticipantOfConversation] 
-    
+    pagination_class = MessagePagination   
     def get_queryset(self):
         # Only return conversations where the user is a participant
         return Conversation.objects.filter(participants=self.request.user)
