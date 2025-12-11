@@ -2,8 +2,10 @@
 import logging
 from datetime import datetime
 
+
 logger = logging.getLogger(__name__)
-handler = logging.FileHandler("request_logs.txt")  # logs will be written here
+
+handler = logging.FileHandler("requests.logs")  # logs will be written here
 formatter = logging.Formatter("%(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
