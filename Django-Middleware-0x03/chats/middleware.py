@@ -12,6 +12,33 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+class RolepermissionMiddleware:
+    """
+    Middleware that checks the user's role before allowing access
+    to restricted actions. Only 'admin' or 'moderator' roles are allowed.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Only enforce if the user is authenticated
+        if request.user.is_authenticated:
+            # Assuming you have a 'role' field on your User model
+            user_role = getattr(request.user, "role", None)
+
+            # Restrict access if not admin or moderator
+            if user_role not in ["admin", "moderator"]:
+                # You can scope this to specific paths if needed
+                if request.path.startswith("/api/admin/") or request.path.startswith("/api/moderator/"):
+                    return HttpResponseForbidden(
+                        "Access denied: You must be an admin or moderator to perform this action."
+                    )
+
+        # Continue processing request
+        response = self.get_response(request)
+        return response
+
 class OffensiveLanguageMiddleware:
     """
     Middleware that limits the number of POST requests (messages)
