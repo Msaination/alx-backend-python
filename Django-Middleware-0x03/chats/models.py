@@ -1,16 +1,22 @@
 from django.db import models
-
-# Create your models here.
-# chats/models.py
 import uuid
-from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+
+# -----------------------------
+# Custom User Model
+# -----------------------------
 class User(AbstractUser):
+    """
+    Extends Django's AbstractUser to include custom fields.
+    Uses UUID as primary key.
+    """
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, null=False, blank=False, db_index=True)
+    password = models.CharField(max_length=128, null=False, blank=False)
+    first_name = models.CharField(max_length=30, null=False, blank=False)
+    last_name = models.CharField(max_length=30, null=False, blank=False)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
-    password = models.CharField(max_length=128)
 
     ROLE_CHOICES = [
         ('guest', 'Guest'),
@@ -21,14 +27,22 @@ class User(AbstractUser):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Remove username if you want email-based login
+    # Override username field to use email for authentication
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
         return f"{self.email} ({self.role})"
 
+
+# -----------------------------
+# Conversation Model
+# -----------------------------
 class Conversation(models.Model):
+    """
+    Tracks which users are involved in a conversation.
+    Many-to-many relationship with User.
+    """
     conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(User, related_name="conversations")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,14 +50,22 @@ class Conversation(models.Model):
     def __str__(self):
         return f"Conversation {self.conversation_id}"
 
+
+# -----------------------------
+# Message Model
+# -----------------------------
 class Message(models.Model):
+    """
+    Represents a message sent by a user in a conversation.
+    """
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages_sent")
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
-    message_body = models.TextField()
+    message_body = models.TextField(null=False, blank=False)
     sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message {self.message_id} from {self.sender.email}"
 
-# End of chats/models.py
+
+# Create your models here.
