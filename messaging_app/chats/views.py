@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer  
-from .permissions import IsParticipant, IsSender
+from .permissions import IsParticipant, IsSender, IsParticipantOfConversation
 
 
 # Create your views here.
@@ -28,7 +28,7 @@ class ChatListView(APIView):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
-    permission_classes  = [IsAuthenticated, IsParticipant ] 
+    permission_classes  = [IsAuthenticated, IsParticipant, IsParticipantOfConversation] 
     
     def get_queryset(self):
         # Only return conversations where the user is a participant
@@ -62,7 +62,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-sent_at')
     serializer_class = MessageSerializer
-    permission_classes  = [IsAuthenticated, IsParticipant | IsSender ]
+    permission_classes  = [IsAuthenticated, IsParticipant | IsSender, IsParticipantOfConversation] 
     
     def get_queryset(self):
         # Only return messages from conversations the user participates in
@@ -88,7 +88,9 @@ class MessageViewSet(viewsets.ModelViewSet):
         
         # Ensure user is a participant
         if request.user not in conversation.participants.all():
-            return Response({"error": "You are not a participant in this conversation."}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"error": "You are not a participant in this conversation."}, 
+                status=status.HTTP_403_FORBIDDEN)
 
         message = Message.objects.create(
             conversation=conversation,
