@@ -12,7 +12,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Django-Middleware-0x03.settings')
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Django-Middleware-0x03.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'messaging_app.settings')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
