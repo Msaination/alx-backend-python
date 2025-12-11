@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer  
 
@@ -26,6 +28,11 @@ class ChatListView(APIView):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
+    permission_classes  = [IsAuthenticated] 
+    
+    def get_queryset(self):
+        # Only return conversations where the user is a participant
+        return Conversation.objects.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         """
@@ -42,6 +49,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         conversation = Conversation.objects.create()
         users = User.objects.filter(user_id__in=participant_ids)
         conversation.participants.set(users)
+        conversation.participants.add(request.user)  # ensure creator is included
         conversation.save()
 
         serializer = self.get_serializer(conversation)
@@ -54,6 +62,11 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-sent_at')
     serializer_class = MessageSerializer
+    
+    def get_queryset(self):
+        # Only return messages from conversations the user participates in
+        return Message.objects.filter(conversation__participants=self.request.user)
+
 
     def create(self, request, *args, **kwargs):
         """
@@ -71,11 +84,14 @@ class MessageViewSet(viewsets.ModelViewSet):
             )
 
         conversation = get_object_or_404(Conversation, conversation_id=conversation_id)
-        sender = get_object_or_404(User, user_id=sender_id)
+        
+        # Ensure user is a participant
+        if request.user not in conversation.participants.all():
+            return Response({"error": "You are not a participant in this conversation."}, status=status.HTTP_403_FORBIDDEN)
 
         message = Message.objects.create(
             conversation=conversation,
-            sender=sender,
+            sender=request.user,
             message_body=body
         )
 

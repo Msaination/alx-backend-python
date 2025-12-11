@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework import routers
 from .views import ChatListView, ConversationViewSet, MessageViewSet
 from rest_framework_nested import routers
+from rest_framework.permissions import IsAuthenticated
 
 
 
@@ -17,4 +18,4 @@ conversations_router.register(r'messages', MessageViewSet, basename='conversatio
 router.register(r'messages', MessageViewSet, basename='message')
 
 
-urlpatterns = router.urls + conversations_router.urls 
+urlpatterns = router.urls + conversations_router.urls
