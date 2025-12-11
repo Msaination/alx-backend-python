@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer  
-
+from .permissions import IsParticipant, IsSender
 
 
 # Create your views here.
@@ -28,7 +28,7 @@ class ChatListView(APIView):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all().order_by('-created_at')
     serializer_class = ConversationSerializer
-    permission_classes  = [IsAuthenticated] 
+    permission_classes  = [IsAuthenticated, IsParticipant ] 
     
     def get_queryset(self):
         # Only return conversations where the user is a participant
@@ -62,6 +62,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-sent_at')
     serializer_class = MessageSerializer
+    permission_classes  = [IsAuthenticated, IsParticipant | IsSender ]
     
     def get_queryset(self):
         # Only return messages from conversations the user participates in
