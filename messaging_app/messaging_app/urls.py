@@ -27,6 +27,7 @@ urlpatterns = [
     # path('api/chats/', include('chats.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),  # include DRF routes under /api/
+    path('api/', include('chats.urls')),  # include nested routes
     
     
 ]
