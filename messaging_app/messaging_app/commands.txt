@@ -1,0 +1,7 @@
+minikube addons enable ingress
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f ingress.yaml
+kubectl get ingress
+minikube ip
+<minikube-ip> messaging.local
+http://messaging.local/api/
