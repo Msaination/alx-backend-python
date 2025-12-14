@@ -19,7 +19,6 @@ spec:
     spec:
       containers:
         - name: messaging-app
-          image: messaging_app-web:blue   # ✅ old/stable version
-          ports:
+          image: messaging_app-web:2.0  # updated image version from latest to 2.0 
             - containerPort: 8000
 
