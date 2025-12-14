@@ -8,11 +8,13 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 # ✅ Upgrade pip
 RUN pip install --upgrade pip   
+
 RUN apt-get update && apt-get install -y \
+    default-libmysqlclient-dev \
     build-essential \
-    libpq-dev \
-    default-libmysqlclient-dev \        
+    pkg-config \
     && rm -rf /var/lib/apt/lists/*
+
 
 
 
