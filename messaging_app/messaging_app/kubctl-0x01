@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# kubctl-0x01.sh
+# Objective: Scale Django app deployment to 3 replicas,
+# verify pods, perform load testing, and monitor resource usage.
+
+DEPLOYMENT_NAME="messaging-app-deployment"
+SERVICE_NAME="messaging-app-service"
+NAMESPACE="default"
+
+echo "🚀 Scaling deployment $DEPLOYMENT_NAME to 3 replicas..."
+kubectl scale deployment/$DEPLOYMENT_NAME --replicas=3 -n $NAMESPACE
+
+echo "🔍 Verifying pods..."
+kubectl get pods -n $NAMESPACE -o wide
+
+# Get ClusterIP of the service
+CLUSTER_IP=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.clusterIP}')
+PORT=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.spec.ports[0].port}')
+
+echo "📋 Service $SERVICE_NAME is running at $CLUSTER_IP:$PORT"
+
+echo "⚡ Performing load test with wrk..."
+wrk -t4 -c100 -d30s http://$CLUSTER_IP:$PORT/
+
+echo "📊 Monitoring resource usage..."
+kubectl top pods -n $NAMESPACE
