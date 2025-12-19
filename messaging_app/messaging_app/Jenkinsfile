@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        VENV = "${WORKSPACE}/venv"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/Msaination/alx-backend-python.git'
+            }
+        }
+
+        stage('Setup Python Env') {
+            steps {
+                sh '''
+                python3 -m venv $VENV
+                source $VENV/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                source $VENV/bin/activate
+                pytest --junitxml=reports/junit.xml --html=reports/report.html --self-contained-html
+                '''
+            }
+        }
+
+        stage('Publish Report') {
+            steps {
+                junit 'reports/junit.xml'
+                publishHTML(target: [
+                    reportDir: 'reports',
+                    reportFiles: 'report.html',
+                    reportName: 'Pytest Report'
+                ])
+            }
+        }
+    }
+
+    triggers {
+        // Manual trigger only (no SCM polling or cron)
+    }
+}
