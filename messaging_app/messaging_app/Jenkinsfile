@@ -1,9 +1,10 @@
 pipeline {
     agent any
 
-    environment {
-        VENV = "${WORKSPACE}/venv"
-    }
+
+    environment { 
+        VENV = "${WORKSPACE}/venv" 
+        DOCKER_IMAGE = "sipho/messaging_app:latest" } 
 
     stages {
         stage('Checkout') {
@@ -34,6 +35,22 @@ pipeline {
             }
         }
 
+
+        stage('Build Docker Image') { 
+            steps { 
+                sh '''
+                 docker build -t $DOCKER_IMAGE . 
+                ''' 
+            } 
+        } 
+        stage('Push Docker Image') { 
+            steps { 
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) { 
+                    sh ''' echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin docker push $DOCKER_IMAGE 
+                    ''' 
+                } 
+            } 
+        }
         stage('Publish Report') {
             steps {
                 junit 'reports/junit.xml'
